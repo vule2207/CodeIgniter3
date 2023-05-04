@@ -27,14 +27,67 @@ class User extends REST_Controller
    */
   public function index_get($id = 0)
   {
-    $users = $this->user_model->getUser($id);
-    if (!empty($users)) {
-      $response = CustomResponse::responseSuccess("Get user successfull!", $users);
-      $this->response($response, REST_Controller::HTTP_OK);
-    } else {
-      $response = CustomResponse::responseError("User not found!");
-      $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
+    $params = $this->input->get();
+    $keywork = $params['keywork'];
+    $limit = $params['limit'] ? $params['limit'] : 10;
+    $page = $params['page'] ? $params['page'] : 1;
+    $order_by = isset($params['order_by']) ? $params['order_by'] : 'name';
+    $sort_by = isset($params['sort_by']) ? $params['sort_by'] : 'asc';
+    $order = $order_by && $sort_by ? array($order_by => $sort_by) : array('name' => 'asc');
+
+    $where = array();
+
+    if ($keywork) {
+      $where["users.name LIKE '%$keywork%'"] = NULL;
     }
+
+    $rows = $this->user_model->getUser($id, NULL, $where, $page, $limit, $order);
+    $total_rows = $this->user_model->get_total_rows();
+    $total_page = ceil((int) $total_rows / (int) $limit);
+
+    /**
+     * Set attribute
+     *  - Loction
+     *  - Pagination
+     *  - Status
+     */
+    $attr['pagination'] = array(
+      'current_page' => $page,
+      'per_page' => $limit,
+      'total_page' => $total_page,
+      'total_rows' => $total_rows
+    );
+
+    /**
+     * Set ordering attribute
+     */
+    if (empty($sort_by) || empty($order_by)) {
+      $attr['order'] = array(
+        'order_by' => 'regdate',
+        'sort_by' => 'desc'
+      );
+    } else {
+      $attr['order'] = array(
+        'order_by' => $order_by,
+        'sort_by' => $sort_by
+      );
+    }
+
+    // $users = $this->user_model->getUser($id);
+
+
+    // if (!empty($users)) {
+    //   if(isset($users['pagination'])) {
+    //     $response = CustomResponse::responseSuccess("Get user successfully!", $users['data'], $users['pagination']);
+    //   } else {
+    //     $response = CustomResponse::responseSuccess("Get user successfully!", $users);
+    //   }
+    //   $this->response($response, REST_Controller::HTTP_OK);
+    // } 
+    // else {
+    //   $response = CustomResponse::responseError("User not found!");
+    //   $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
+    // }
   }
 
   /**
@@ -44,7 +97,9 @@ class User extends REST_Controller
    */
   public function index_post()
   {
-    $input = $this->input->post();
+    $input = $this->post();
+    // $params = json_decode(file_get_contents('php://input'), true);
+
     if (!empty($input)) {
       $data = $this->user_model->insert($input);
       if (!empty($data)) {
@@ -106,4 +161,6 @@ class User extends REST_Controller
       $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
     }
   }
+
+
 }

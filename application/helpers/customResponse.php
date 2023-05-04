@@ -4,13 +4,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class CustomResponse
 {
 
-  static function responseSuccess($message, $data)
+  static function responseSuccess($message, $data, $pagination = null)
   {
-    $response = [
-      'success' => true,
-      'message' => $message,
-      'data' => $data
-    ];
+    if(!empty($pagination)) {
+      $response = [
+        'success' => true,
+        'message' => $message,
+        'data' => $data,
+        'pagination' => $pagination
+      ];
+    } else {
+      $response = [
+        'success' => true,
+        'message' => $message,
+        'data' => $data,
+      ];
+    }
     return $response;
   }
 
