@@ -23,6 +23,30 @@ class User_model extends CI_Model
      */
     function getUser($id = "", $fields = NULL, $where = NULL, $page = NULL, $limit = NULL, $order = 'name asc')
     {
+        $fields = $fields ? $fields : '*';
+        $result = array();
+
+        $this->db
+            ->select($fields)
+            ->from($this->tbl_name);
+
+        if (!empty($where)) {
+            foreach ($where as $key => $val) {
+                $this->_set_where([$key => $val]);
+            }
+        }
+
+        if ($order) {
+            $this->_set_order_by($order);
+        }
+
+        // Count total rows
+        $temp_db = clone $this->db;
+        $temp_query = $temp_db->get();
+        if ($temp_query && $temp_query->num_rows() > 0) {
+            $this->total_rows = $temp_query->num_rows();
+        }
+
         // Limit
         if ($page != NULL && $limit != NULL) {
             //start
@@ -31,14 +55,14 @@ class User_model extends CI_Model
             $this->db->limit($limit, $start);
         }
 
+        $query = $this->db->get();
 
-        if (!empty($id)) {
-            $query = $this->db->get_where($this->tbl_name, array('id' => $id));
-            return $query->row_array();
-        } else {
-            $query = $this->db->get($this->tbl_name);
-            return $query->result_array();
+        if ($query && $query->num_rows() > 0) {
+            $result = $query->result_array();
+            $query->free_result();
         }
+
+        return $result;
     }
 
     /* 

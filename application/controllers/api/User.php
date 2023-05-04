@@ -28,9 +28,9 @@ class User extends REST_Controller
   public function index_get($id = 0)
   {
     $params = $this->input->get();
-    $keywork = $params['keywork'];
-    $limit = $params['limit'] ? $params['limit'] : 10;
-    $page = $params['page'] ? $params['page'] : 1;
+    $keywork = isset($params['keywork']) ? $params['keywork'] : '';
+    $limit = isset($params['limit']) ? $params['limit'] : 10;
+    $page = isset($params['page']) ? $params['page'] : 1;
     $order_by = isset($params['order_by']) ? $params['order_by'] : 'name';
     $sort_by = isset($params['sort_by']) ? $params['sort_by'] : 'asc';
     $order = $order_by && $sort_by ? array($order_by => $sort_by) : array('name' => 'asc');
@@ -54,8 +54,8 @@ class User extends REST_Controller
     $attr['pagination'] = array(
       'current_page' => $page,
       'per_page' => $limit,
+      'total_rows' => $total_rows,
       'total_page' => $total_page,
-      'total_rows' => $total_rows
     );
 
     /**
@@ -73,7 +73,14 @@ class User extends REST_Controller
       );
     }
 
-    // $users = $this->user_model->getUser($id);
+    $response = array(
+      'success' => TRUE,
+      'message' => "Get user successfull!",
+      'rows' => $rows,
+      'attr' => $attr
+    );
+
+    $this->response($response, REST_Controller::HTTP_OK);
 
 
     // if (!empty($users)) {
