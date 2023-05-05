@@ -52,10 +52,10 @@ class User extends REST_Controller
      *  - Status
      */
     $attr['pagination'] = array(
-      'current_page' => $page,
-      'per_page' => $limit,
-      'total_rows' => $total_rows,
-      'total_page' => $total_page,
+      'current_page' => (int) $page,
+      'per_page' => (int) $limit,
+      'total_rows' => (int) $total_rows,
+      'total_page' => (int) $total_page,
     );
 
     /**
@@ -105,6 +105,24 @@ class User extends REST_Controller
   public function index_post()
   {
     $input = $this->post();
+    // $avatar_base64 = $this->input->post('avatar');
+
+    // if ($avatar_base64) {
+    //   $data_image = base64_decode($avatar_base64);
+    //   $file_name = 'avatar-' . strtolower($this->input->post('name')) . '-' . md5(rand() . time());
+    //   file_put_contents(APPPATH . 'uploads/avatar/' . $file_name . '.jpg', $data_image);
+    //   $config['upload_path'] = 'uploads/avatar';
+    //   $config['allowed_types'] = 'jpg|jpeg|png|gif';
+    //   $config['file_name'] = $file_name . '.jpg';
+
+    //   $this->load->library('upload', $config);
+    //   $this->upload->initialize($config);
+    //   $this->upload->do_upload($data_image);
+
+    //   $uploadData = $this->upload->data();
+    //   $input["avatar"] = $uploadData['file_name'] ? $uploadData['file_name'] : '';
+
+    // }
     // $params = json_decode(file_get_contents('php://input'), true);
 
     if (!empty($input)) {
@@ -168,6 +186,5 @@ class User extends REST_Controller
       $this->response($response, REST_Controller::HTTP_BAD_REQUEST);
     }
   }
-
 
 }

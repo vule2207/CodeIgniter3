@@ -76,6 +76,9 @@ class User_model extends CI_Model
         if (!array_key_exists('updated_at', $data)) {
             $data['updated_at'] = date("Y-m-d H:i:s");
         }
+        if (!array_key_exists('avatar', $data)) {
+            $data['avatar'] = 'https://api.dicebear.com/6.x/big-ears-neutral/svg?seed=' . $data['name'];
+        }
         $insert = $this->db->insert($this->tbl_name, $data);
         if ($insert) {
             return $this->db->insert_id();
