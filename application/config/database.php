@@ -75,10 +75,15 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => '12345678',
-	'database' => 'lara_shop',
+	// 'hostname' => 'localhost',
+	// 'username' => 'root',
+	// 'password' => '12345678',
+	// 'database' => 'lara_shop',
+	// 'dbdriver' => 'mysqli',
+	'hostname' => 'bm8y1mja4jbxupisavuo-mysql.services.clever-cloud.com',
+	'username' => 'us908tpfyiycp4nr',
+	'password' => 'kFNM13pjfLO3o8NvDv0s',
+	'database' => 'bm8y1mja4jbxupisavuo',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
 	'pconnect' => FALSE,
@@ -94,3 +99,10 @@ $db['default'] = array(
 	'failover' => array(),
 	'save_queries' => TRUE
 );
+
+// DB_CONNECTION=mysql
+// DB_HOST=bm8y1mja4jbxupisavuo-mysql.services.clever-cloud.com
+// DB_PORT=3306
+// DB_DATABASE=bm8y1mja4jbxupisavuo
+// DB_USERNAME=us908tpfyiycp4nr
+// DB_PASSWORD=kFNM13pjfLO3o8NvDv0s

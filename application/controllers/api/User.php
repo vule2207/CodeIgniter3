@@ -4,7 +4,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 require APPPATH . 'libraries/REST_Controller.php';
 require APPPATH . 'helpers/customResponse.php';
 
-
 class User extends REST_Controller
 {
 
@@ -18,6 +17,8 @@ class User extends REST_Controller
     parent::__construct();
     $this->load->database();
     $this->load->model('user_model');
+    $this->load->library('upload');
+    $this->load->helper('url');
   }
 
   /**
@@ -104,29 +105,30 @@ class User extends REST_Controller
    */
   public function index_post()
   {
-    $input = $this->post();
-    // $avatar_base64 = $this->input->post('avatar');
+    $data_add = $this->post();
 
-    // if ($avatar_base64) {
-    //   $data_image = base64_decode($avatar_base64);
-    //   $file_name = 'avatar-' . strtolower($this->input->post('name')) . '-' . md5(rand() . time());
-    //   file_put_contents(APPPATH . 'uploads/avatar/' . $file_name . '.jpg', $data_image);
-    //   $config['upload_path'] = 'uploads/avatar';
-    //   $config['allowed_types'] = 'jpg|jpeg|png|gif';
-    //   $config['file_name'] = $file_name . '.jpg';
+    if ($_FILES['avatar']) {
+      $upload_path = 'public/images/avatar';
+      $file_name = 'avatar-' . strtolower($this->input->post('name')) . '-' . time();
+      $config = array(
+        'upload_path' => $upload_path,
+        'allowed_types' => 'jpg|jpeg|png|gif',
+        'file_name' => $file_name,
+      );
 
-    //   $this->load->library('upload', $config);
-    //   $this->upload->initialize($config);
-    //   $this->upload->do_upload($data_image);
+      $this->upload->initialize($config);
 
-    //   $uploadData = $this->upload->data();
-    //   $input["avatar"] = $uploadData['file_name'] ? $uploadData['file_name'] : '';
+      if ($this->upload->do_upload('avatar')) {
+        $uploadData = $this->upload->data();
+        $data_add["avatar"] = base_url() . $upload_path . '/' . $uploadData['file_name'];
+      } else {
+        $data_add["avatar"] = '';
+        echo $this->upload->display_errors();
+      }
+    }
 
-    // }
-    // $params = json_decode(file_get_contents('php://input'), true);
-
-    if (!empty($input)) {
-      $data = $this->user_model->insert($input);
+    if (!empty($data_add)) {
+      $data = $this->user_model->insert($data_add);
       if (!empty($data)) {
         $response = CustomResponse::responseSuccess("User created successfully!", $data);
         $this->response($response, REST_Controller::HTTP_CREATED);

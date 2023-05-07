@@ -372,7 +372,6 @@ $config['rest_key_length'] = 40;
 |--------------------------------------------------------------------------
 |
 | Custom header to specify the API key
-
 | Note: Custom headers with the X- prefix are deprecated as of
 | 2012/06/12. See RFC 6648 specification for more details
 |
