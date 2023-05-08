@@ -21,7 +21,7 @@ class User_model extends CI_Model
     /* 
      * Fetch user data 
      */
-    function getUser($id = "", $fields = NULL, $where = NULL, $page = NULL, $limit = NULL, $order = 'name asc')
+    public function getUser($id = "", $fields = NULL, $where = NULL, $page = NULL, $limit = NULL, $order = 'name asc')
     {
         $fields = $fields ? $fields : '*';
         $result = array();
@@ -63,6 +63,13 @@ class User_model extends CI_Model
         }
 
         return $result;
+    }
+
+    public function get_user_by_id($user_id)
+    {
+        $this->db->from('users');
+        $this->db->where('id', $user_id);
+        return $this->db->get()->row();
     }
 
     /* 
@@ -112,6 +119,61 @@ class User_model extends CI_Model
         return $delete ? true : false;
     }
 
+    // auth
+    public function create_user($username, $email, $password)
+    {
+
+        $data = array(
+            'username' => $username,
+            'email' => $email,
+            'password' => $this->hash_password($password),
+            'created_at' => date('Y-m-j H:i:s'),
+        );
+
+        $this->db->insert('users', $data);
+        return $this->db->insert_id();
+
+    }
+
+    public function resolve_user_login($username, $password)
+    {
+
+        $this->db->select('password');
+        $this->db->from('users');
+        $this->db->where('username', $username);
+        $hash = $this->db->get()->row('password');
+
+        return $this->verify_password_hash($password, $hash);
+
+    }
+
+    public function get_user_id_from_username($username)
+    {
+
+        $this->db->select('id');
+        $this->db->from('users');
+        $this->db->where('username', $username);
+
+        return $this->db->get()->row('id');
+
+    }
+
+    private function hash_password($password)
+    {
+
+        return password_hash($password, PASSWORD_BCRYPT);
+
+    }
+
+    private function verify_password_hash($password, $hash)
+    {
+
+        return password_verify($password, $hash);
+
+    }
+
+
+    // pagination and filter
     public function _set_where($where)
     {
         if (is_array($where)) {

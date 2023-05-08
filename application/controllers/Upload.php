@@ -22,7 +22,7 @@ class Upload extends REST_Controller
   public function index_post($id)
   {
     if ($_FILES['avatar']) {
-      $upload_path = 'public/images/avatar';
+      $upload_path = 'public/images/avatars';
       $file_name = 'avatar-' . strtolower($this->input->post('name')) . '-' . time();
       $config = array(
         'upload_path' => $upload_path,
@@ -45,10 +45,21 @@ class Upload extends REST_Controller
         $this->response(
           array(
             'success' => true,
-            'message' => 'update avatar successfull!',
+            'message' => 'Update avatar successfull!',
             'data' => $id
-          ), REST_Controller::HTTP_OK);
+          ), REST_Controller::HTTP_OK
+        );
       }
+    }
+  }
+
+  private function delete_old_avatar($id)
+  {
+    $full_path = $this->db->select('avatar')->from('users')->where('id', $id)->get();
+    $old_path_avatar = str_replace(base_url(), '', $full_path);
+
+    if (file_exists($old_path_avatar)) {
+      unlink($old_path_avatar);
     }
   }
 }
