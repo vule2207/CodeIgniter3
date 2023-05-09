@@ -120,10 +120,11 @@ class User_model extends CI_Model
     }
 
     // auth
-    public function create_user($username, $email, $password)
+    public function create_user($name, $username, $email, $password)
     {
 
         $data = array(
+            'name' => $name,
             'username' => $username,
             'email' => $email,
             'password' => $this->hash_password($password),
