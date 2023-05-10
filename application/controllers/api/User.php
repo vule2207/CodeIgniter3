@@ -284,12 +284,12 @@ class User extends REST_Controller
         $user = $this->user_model->get_user_by_id($user_id);
 
         // set session user datas
-        // $this->session->set_userdata('user_data', $sess_data);
-        // $_SESSION['user_id'] = (int) $user->id;
-        // $_SESSION['username'] = (string) $user->username;
-        // $_SESSION['logged_in'] = (bool) true;
-        // $_SESSION['is_confirmed'] = (bool) $user->is_confirmed;
-        // $_SESSION['is_admin'] = (bool) $user->is_admin;
+        $this->load->library('session');
+        $_SESSION['user_id'] = (int) $user->id;
+        $_SESSION['username'] = (string) $user->username;
+        $_SESSION['logged_in'] = (bool) true;
+        $_SESSION['is_confirmed'] = (bool) $user->is_confirmed;
+        $_SESSION['is_admin'] = (bool) $user->is_admin;
 
         // user login ok
         $token_data['uid'] = $user_id;
@@ -341,22 +341,32 @@ class User extends REST_Controller
     if ($query->num_rows() > 0) {
       $row = $query->row();
       if (is_string($row->data)) {
-        $session_data = unserialize($row->data);
+        session_start();
+        session_decode($row->data);
+        $session_data = $_SESSION;
       }
 
-      print_r($session_data);
-      exit();
+      // print_r($session_data);
+      // exit();
 
     } else {
-
+      $this->response(
+        array(
+          'success' => false,
+          'message' => "Authentication failed"
+        ),
+        401
+      );
     }
-    exit();
+
     if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
       // remove session datas
       foreach ($_SESSION as $key => $value) {
         unset($_SESSION[$key]);
       }
+
+      $this->db->delete('ci_sessions', array('id' => $session_id));
 
       // user logout ok
       $this->response(
