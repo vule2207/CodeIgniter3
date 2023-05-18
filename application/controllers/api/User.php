@@ -12,12 +12,11 @@ class User extends REST_Controller
   {
     parent::__construct();
     $this->load->database();
-    $this->load->model('user_model');
     $this->load->library('upload');
+    $this->load->model('user_model');
     $this->load->helper('url');
     $this->load->library('Authorization_Token');
     $this->load->library('form_validation');
-    // $this->load->library('session');
   }
 
 
@@ -216,7 +215,12 @@ class User extends REST_Controller
     if ($this->form_validation->run() === false) {
 
       // validation not ok, send validation errors to the view
-      $this->response(['Validation rules violated'], REST_Controller::HTTP_OK);
+      $this->response(
+        array(
+          'success' => false,
+          'message' => 'Validation rules violated'
+        ), REST_Controller::HTTP_OK
+      );
 
     } else {
 
@@ -284,12 +288,23 @@ class User extends REST_Controller
         $user = $this->user_model->get_user_by_id($user_id);
 
         // set session user datas
-        // $this->session->set_userdata('user_data', $sess_data);
         // $_SESSION['user_id'] = (int) $user->id;
         // $_SESSION['username'] = (string) $user->username;
         // $_SESSION['logged_in'] = (bool) true;
         // $_SESSION['is_confirmed'] = (bool) $user->is_confirmed;
         // $_SESSION['is_admin'] = (bool) $user->is_admin;
+
+        $this->load->library('session');
+        // set array of items in session 
+        $arraydata = array(
+          'user_id' => (int) $user->id,
+          'username' => (string) $user->username,
+          'logged_in' => (bool) true,
+          'is_admin' => (bool) $user->is_admin
+        );
+        $this->session->set_userdata($arraydata);
+
+
 
         // user login ok
         $token_data['uid'] = $user_id;
@@ -331,26 +346,27 @@ class User extends REST_Controller
    */
   public function logout_post()
   {
-    $input = $this->post();
-    $data = json_decode($input[0], true);
-    $session_id = $data['session_id'];
+    // $input = $this->post();
+    // $data = json_decode($input[0], true);
+    // $session_id = $data['session_id'];
 
-    $this->db->where('id', $session_id);
-    $query = $this->db->get('ci_sessions');
+    // $this->db->where('id', $session_id);
+    // $query = $this->db->get('ci_sessions');
 
-    if ($query->num_rows() > 0) {
-      $row = $query->row();
-      if (is_string($row->data)) {
-        $session_data = unserialize($row->data);
-      }
+    // if ($query->num_rows() > 0) {
+    //   $row = $query->row();
+    //   if (is_string($row->data)) {
+    //     $session_data = unserialize($row->data);
+    //   }
 
-      print_r($session_data);
-      exit();
+    //   print_r($session_data);
+    //   exit();
 
-    } else {
+    // } else {
 
-    }
-    exit();
+    // }
+    // get e'thing stored in session at once 
+    $this->load->library('session');
     if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
       // remove session datas
