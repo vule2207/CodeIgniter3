@@ -22,7 +22,7 @@ class Upload extends REST_Controller
   public function index_post($id)
   {
     if ($_FILES['avatar']) {
-      $upload_path = 'public/images/avatars';
+      $upload_path = 'public/images/avatar';
       $file_name = 'avatar-' . strtolower($this->input->post('name')) . '-' . time();
       $config = array(
         'upload_path' => $upload_path,

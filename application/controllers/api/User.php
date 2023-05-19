@@ -12,12 +12,11 @@ class User extends REST_Controller
   {
     parent::__construct();
     $this->load->database();
-    $this->load->model('user_model');
     $this->load->library('upload');
+    $this->load->model('user_model');
     $this->load->helper('url');
     $this->load->library('Authorization_Token');
     $this->load->library('form_validation');
-    // $this->load->library('session');
 
     // validate token 
     $headers = $this->input->request_headers();
@@ -242,7 +241,12 @@ class User extends REST_Controller
     if ($this->form_validation->run() === false) {
 
       // validation not ok, send validation errors to the view
-      $this->response(['Validation rules violated'], REST_Controller::HTTP_OK);
+      $this->response(
+        array(
+          'success' => false,
+          'message' => 'Validation rules violated'
+        ), REST_Controller::HTTP_OK
+      );
 
     } else {
 
@@ -357,12 +361,12 @@ class User extends REST_Controller
    */
   public function logout_post()
   {
-    $input = $this->post();
-    $data = json_decode($input[0], true);
-    $session_id = $data['session_id'];
+    // $input = $this->post();
+    // $data = json_decode($input[0], true);
+    // $session_id = $data['session_id'];
 
-    $this->db->where('id', $session_id);
-    $query = $this->db->get('ci_sessions');
+    // $this->db->where('id', $session_id);
+    // $query = $this->db->get('ci_sessions');
 
     if ($query->num_rows() > 0) {
       $row = $query->row();
