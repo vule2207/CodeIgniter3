@@ -18,6 +18,27 @@ class User extends REST_Controller
     $this->load->library('Authorization_Token');
     $this->load->library('form_validation');
     // $this->load->library('session');
+
+    // validate token 
+    $headers = $this->input->request_headers();
+    if (isset($headers['Authorization'])) {
+      $decodedToken = $this->authorization_token->validateToken($headers['Authorization']);
+      if (!$decodedToken['status']) {
+        $this->response(
+          array(
+            'success' => false,
+            'message' => 'Authentication failed'
+          ), REST_Controller::HTTP_OK
+        );
+      }
+    } else {
+      $this->response(
+        array(
+          'success' => false,
+          'message' => 'Authentication failed'
+        ), REST_Controller::HTTP_OK
+      );
+    }
   }
 
 
@@ -135,7 +156,12 @@ class User extends REST_Controller
         $this->response($decodedToken);
       }
     } else {
-      $this->response(['Authentication failed'], REST_Controller::HTTP_OK);
+      $this->response(
+        array(
+          'success' => false,
+          'message' => 'Authentication failed'
+        ), REST_Controller::HTTP_OK
+      );
     }
 
   }
